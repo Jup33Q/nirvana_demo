@@ -3,7 +3,7 @@
 ![GitHub stars](https://img.shields.io/github/stars/Jup33Q/nirvana_demo?style=flat-square)
 ![License](https://img.shields.io/badge/License-CC0-lightgrey.svg?style=flat-square)
 ![Elixir](https://img.shields.io/badge/Elixir-1.20.0-purple?style=flat-square&logo=elixir&logoColor=white)
-![Phoenix](https://img.shields.io/badge/Phoenix-~%201.8.7-orange?style=flat-square&logo=phoenixframework&logoColor=white)
+![Phoenix](https://img.shields.io/badge/Phoenix-1.8.7-orange?style=flat-square&logo=phoenixframework&logoColor=white)
 
 To start your Phoenix server:
 
