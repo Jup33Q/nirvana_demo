@@ -1,0 +1,593 @@
+/* See the Tailwind configuration guide for advanced usage
+   https://tailwindcss.com/docs/configuration */
+
+@import "tailwindcss" source(none);
+@source "../css";
+@source "../js";
+@source "../../lib/nirvana_demo_web";
+
+/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+   The heroicons installation itself is managed by your mix.exs */
+@plugin "../vendor/heroicons";
+
+/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
+   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+@plugin "../vendor/daisyui" {
+  themes: false;
+}
+
+/* daisyUI theme plugin. You can update this file by fetching the latest version with:
+  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
+  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
+  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
+@plugin "../vendor/daisyui-theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(30.33% 0.016 252.42);
+  --color-base-200: oklch(25.26% 0.014 253.1);
+  --color-base-300: oklch(20.15% 0.012 254.09);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: oklch(58% 0.233 277.117);
+  --color-primary-content: oklch(96% 0.018 272.314);
+  --color-secondary: oklch(58% 0.233 277.117);
+  --color-secondary-content: oklch(96% 0.018 272.314);
+  --color-accent: oklch(60% 0.25 292.717);
+  --color-accent-content: oklch(96% 0.016 293.756);
+  --color-neutral: oklch(37% 0.044 257.287);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(60% 0.118 184.704);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "../vendor/daisyui-theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0 0);
+  --color-base-200: oklch(96% 0.001 286.375);
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(70% 0.213 47.604);
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: oklch(55% 0.027 264.364);
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(62% 0.214 259.815);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(70% 0.14 182.503);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Use the data attribute for dark mode  */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* This file is for your main application CSS */
+
+.slide-deck {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0f172a;
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  cursor: none;
+}
+
+.slide-deck.cursor-visible {
+  cursor: auto;
+}
+
+.slide-deck.cursor-visible .osc-btn {
+  cursor: pointer;
+}
+
+.osc-btn-active {
+  background: rgba(56, 189, 248, 0.35) !important;
+  color: #e0f2fe !important;
+}
+
+.slide-container {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  pointer-events: none;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  width: 92vw;
+  max-width: 1280px;
+  max-height: 86vh;
+  padding: 2rem 0;
+  pointer-events: none;
+}
+
+.slide-active {
+  animation: slideEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Direction-aware slide entry */
+.slide[data-direction="1"].slide-active {
+  animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide[data-direction="-1"].slide-active {
+  animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Slide Panels ── */
+.slide-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 16px;
+  padding: 2rem 3rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(56, 189, 248, 0.04) inset;
+  color: #e2e8f0;
+  pointer-events: auto;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+  animation: panelFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.slide-panel:nth-child(1) { animation-delay: 0.08s; }
+.slide-panel:nth-child(2) { animation-delay: 0.14s; }
+.slide-panel:nth-child(3) { animation-delay: 0.20s; }
+.slide-panel:nth-child(4) { animation-delay: 0.26s; }
+.slide-panel:nth-child(5) { animation-delay: 0.32s; }
+
+.slide-panel:hover {
+  transform: translateY(-4px) scale(1.005);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(56, 189, 248, 0.12),
+    0 0 0 1px rgba(56, 189, 248, 0.1) inset;
+}
+
+.slide-panel-title {
+  text-align: center;
+  padding: 1.5rem 3rem;
+}
+
+.slide-panel-subtitle {
+  text-align: center;
+  padding: 1.25rem 3rem;
+}
+
+.slide-panel-data {
+  overflow-x: auto;
+}
+
+@keyframes panelFadeIn {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Multi-table panels */
+.slide-multi-panels {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.slide-multi-panels .slide-panel {
+  flex: 1;
+  min-width: 0;
+  padding: 1.5rem 1.75rem;
+  max-height: 54vh;
+  overflow-y: auto;
+}
+
+.slide-multi-panels .slide-panel:first-child {
+  flex: 0.38;
+}
+
+.slide-multi-panels .slide-panel:last-child {
+  flex: 0.62;
+}
+
+@media (max-width: 768px) {
+  .slide-multi-panels {
+    flex-direction: column;
+  }
+  .slide-multi-panels .slide-panel:first-child,
+  .slide-multi-panels .slide-panel:last-child {
+    flex: 1;
+  }
+}
+
+@keyframes slideEnter {
+  0% {
+    transform: scale(0.9) translateX(80px);
+    opacity: 0.2;
+    filter: blur(6px);
+  }
+  100% {
+    transform: scale(1) translateX(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(120px) scale(0.92);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-120px) scale(0.92);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.slide-content {
+  position: relative;
+  z-index: 2;
+  width: 92vw;
+  max-width: 1280px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 16px;
+  padding: 3rem 4rem;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(56, 189, 248, 0.06) inset;
+  color: #e2e8f0;
+}
+
+.slide-content h1,
+.slide-title {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  animation: textFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.slide-content h2,
+.slide-subtitle {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  animation: textFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.slide-content h3,
+.slide-h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #67e8f9;
+  margin: 1.25rem 0 0.75rem;
+  animation: textFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.slide-content p,
+.slide-line,
+.slide-top-text {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #cbd5e1;
+  text-align: center;
+  animation: textFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.slide-top-text {
+  text-align: left;
+  margin-bottom: 0.75rem;
+}
+
+@keyframes textFadeUp {
+  0% {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Cover slide */
+.slide-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 0.5rem;
+}
+
+.slide-footer .slide-line {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+/* Table styles */
+.slide-table-wrap {
+  overflow-x: auto;
+  margin: 0.75rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.08);
+}
+
+.slide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.05rem;
+  animation: textFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
+}
+
+.slide-table thead {
+  background: rgba(30, 58, 95, 0.6);
+}
+
+.slide-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #38bdf8;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  white-space: nowrap;
+}
+
+.slide-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+}
+
+.slide-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.slide-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.04);
+}
+
+/* Multi-table layout */
+.slide-multi-tables {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.slide-table-group {
+  flex: 1;
+}
+
+/* Blockquote */
+.slide-blockquote {
+  margin-top: 1.25rem;
+  padding: 0.875rem 1.25rem;
+  border-left: 4px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 0 8px 8px 0;
+  font-size: 1rem;
+  color: #94a3b8;
+  font-style: italic;
+  animation: textFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
+
+/* OSC controls */
+.bespoke-marp-osc {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.osc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.osc-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+  transform: scale(1.1);
+}
+
+.osc-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.osc-page {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #94a3b8;
+  min-width: 3.5rem;
+  text-align: center;
+  user-select: none;
+}
+
+/* Progress bar */
+.slide-progress {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 50;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.slide-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #a78bfa);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scrollbar */
+.slide-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.slide-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.slide-content::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.2);
+  border-radius: 3px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .slide,
+  .slide-active,
+  .slide-content h1,
+  .slide-content h2,
+  .slide-content h3,
+  .slide-content p,
+  .slide-table,
+  .slide-blockquote {
+    animation: none !important;
+  }
+
+  #geometric-canvas {
+    display: none;
+  }
+}
+
+/* Page transition overlay */
+#page-transition.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .slide-content {
+    width: 95vw;
+    padding: 1.5rem;
+    max-height: 80vh;
+  }
+
+  .slide-title {
+    font-size: 1.4rem;
+  }
+
+  .slide-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .slide-table {
+    font-size: 0.8rem;
+  }
+
+  .slide-table th,
+  .slide-table td {
+    padding: 0.4rem 0.5rem;
+  }
+}
+
+/* This file is for your main application CSS */

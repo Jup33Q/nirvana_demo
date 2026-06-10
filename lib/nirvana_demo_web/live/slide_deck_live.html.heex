@@ -1,0 +1,297 @@
+<div
+  id="slide-deck"
+  class={["slide-deck", @cursor_visible && "cursor-visible"]}
+  phx-window-keydown="navigate"
+>
+  <%= if @needs_cookie_redirect do %>
+    <%!-- Client-side cookie redirect for /slides without an ID --%>
+    <script>
+      (function() {
+        const m = document.cookie.match(/(?:^|; )last_slide=([^;]*)/);
+        const id = m ? decodeURIComponent(m[1]) : '1';
+        window.location.replace('/slides/' + id);
+      })();
+    </script>
+  <% else %>
+    <%!-- Geometric Matrix Background --%>
+    <canvas
+      id="geometric-canvas"
+      phx-hook="GeometricMatrix"
+      phx-update="ignore"
+      style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:auto;"
+    >
+    </canvas>
+
+    <%!-- Transition Flash Overlay --%>
+    <div
+      id="transition-flash"
+      phx-hook="TransitionFlash"
+      style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:100;opacity:0;"
+    >
+    </div>
+
+    <%!-- Slide Content --%>
+    <div class="slide-container">
+      <div class="slide slide-active" data-direction={@direction}>
+        <%!-- Title Panel --%>
+        <div
+          :if={@slide[:title]}
+          class="slide-panel slide-panel-title"
+        >
+          <h1 class="slide-title">{@slide.title}</h1>
+        </div>
+
+        <%!-- Subtitle Panel --%>
+        <div
+          :if={@slide[:subtitle]}
+          class="slide-panel slide-panel-subtitle"
+        >
+          <h2 class="slide-subtitle">{@slide.subtitle}</h2>
+        </div>
+
+        <%!-- Data Panel: Cover / Footer lines --%>
+        <div
+          :if={@slide[:lines]}
+          class="slide-panel slide-panel-data"
+        >
+          <p :for={line <- @slide[:lines] || []} class="slide-line">{Phoenix.HTML.raw(line)}</p>
+        </div>
+
+        <%!-- Data Panel: Simple table --%>
+        <div
+          :if={@slide.type == :simple_table and @slide[:rows]}
+          class="slide-panel slide-panel-data"
+        >
+          <div class="slide-table-wrap">
+            <table class="slide-table">
+              <thead>
+                <tr>
+                  <th :for={h <- @slide[:headers] || []}>{h}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :for={row <- @slide[:rows] || []}>
+                  <td :for={cell <- row}>{cell}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <%!-- Data Panel: Metrics --%>
+        <div
+          :if={@slide.type == :metrics and @slide[:rows]}
+          class="slide-panel slide-panel-data"
+        >
+          <div class="slide-table-wrap">
+            <table class="slide-table">
+              <thead>
+                <tr>
+                  <th :for={h <- @slide[:headers] || []}>{h}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :for={row <- @slide[:rows] || []}>
+                  <td
+                    :for={{cell, ci} <- Enum.with_index(row)}
+                    class={if ci == 1, do: "font-bold text-primary", else: ""}
+                  >
+                    {cell}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div
+          :if={@slide.type == :metrics and @slide[:blockquote]}
+          class="slide-panel slide-panel-data"
+        >
+          <blockquote class="slide-blockquote">{@slide.blockquote}</blockquote>
+        </div>
+
+        <%!-- Data Panel: Standard table --%>
+        <div
+          :if={@slide.type == :table and @slide[:rows]}
+          class="slide-panel slide-panel-data"
+        >
+          <div class="slide-table-wrap">
+            <table class="slide-table">
+              <thead>
+                <tr>
+                  <th :for={h <- @slide[:headers] || []}>{h}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :for={row <- @slide[:rows] || []}>
+                  <td :for={cell <- row}>{cell}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div
+          :if={@slide.type == :table and @slide[:blockquote]}
+          class="slide-panel slide-panel-data"
+        >
+          <blockquote class="slide-blockquote">{@slide.blockquote}</blockquote>
+        </div>
+
+        <%!-- Data Panel: Table with top text --%>
+        <div
+          :if={@slide.type == :table_with_text and @slide[:top_text]}
+          class="slide-panel slide-panel-data"
+        >
+          <p class="slide-top-text">{Phoenix.HTML.raw(@slide.top_text)}</p>
+        </div>
+        <div
+          :if={@slide.type == :table_with_text and @slide[:h3]}
+          class="slide-panel slide-panel-data"
+        >
+          <h3 class="slide-h3">{@slide.h3}</h3>
+        </div>
+        <div
+          :if={@slide.type == :table_with_text and @slide[:rows]}
+          class="slide-panel slide-panel-data"
+        >
+          <div class="slide-table-wrap">
+            <table class="slide-table">
+              <thead>
+                <tr>
+                  <th :for={h <- @slide[:headers] || []}>{h}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :for={row <- @slide[:rows] || []}>
+                  <td :for={cell <- row}>{cell}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <%!-- Data Panel: Multi-table --%>
+        <div
+          :if={@slide.type == :multi_table}
+          class="slide-multi-panels"
+        >
+          <div
+            :for={tbl <- @slide[:tables] || []}
+            class="slide-panel slide-panel-data"
+          >
+            <h3 :if={tbl[:title]} class="slide-h3">{tbl.title}</h3>
+            <div class="slide-table-wrap">
+              <table class="slide-table">
+                <thead>
+                  <tr>
+                    <th :for={h <- tbl[:headers] || []}>{h}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr :for={row <- tbl[:rows] || []}>
+                    <td :for={cell <- row}>{cell}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <%!-- Data Panel: Chart (ECharts) --%>
+        <div
+          :if={@slide.type == :chart and @slide[:chart_type]}
+          class="slide-panel slide-panel-data"
+        >
+          <div
+            id="slide-chart"
+            phx-hook="ECharts"
+            phx-update="ignore"
+            data-chart-type={@slide.chart_type}
+            data-chart-title={@slide[:chart_title]}
+            data-chart-data={Jason.encode!(@slide[:chart_data] || %{})}
+            style="width:100%;height:320px;"
+          >
+          </div>
+        </div>
+        <div
+          :if={@slide.type == :chart and @slide[:blockquote]}
+          class="slide-panel slide-panel-data"
+        >
+          <blockquote class="slide-blockquote">{@slide.blockquote}</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <%!-- On-Screen Controls (OSC) --%>
+    <div class="bespoke-marp-osc">
+      <.link navigate={~p"/"} title="Home" class="osc-btn" aria-label="Home">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      </.link>
+      <button
+        phx-click="prev"
+        title="Previous slide (←)"
+        class="osc-btn"
+        aria-label="Previous slide"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+      <span class="osc-page">{@current + 1} / {@total}</span>
+      <button phx-click="next" title="Next slide (→)" class="osc-btn" aria-label="Next slide">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+      <button
+        phx-click="toggle_cursor"
+        title={if @cursor_visible, do: "Hide cursor", else: "Show cursor"}
+        class={["osc-btn", @cursor_visible && "osc-btn-active"]}
+        aria-label="Toggle cursor"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+        </svg>
+      </button>
+    </div>
+
+    <%!-- Progress Bar --%>
+    <div class="slide-progress">
+      <div class="slide-progress-bar" style={"width: #{(@current + 1) / @total * 100}%"}></div>
+    </div>
+  <% end %>
+</div>
